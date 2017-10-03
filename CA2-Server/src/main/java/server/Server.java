@@ -14,12 +14,14 @@ public class Server {
 
     private ServerSocket serverSocket;
     private ExecutorService ex;
-    private Collection<ClientHandler> clientList;
+    private Collection<ClientHandler> clients;
+    private MessageHandler messageHandler;
 
     public Server()
     {
         this.ex = Executors.newCachedThreadPool();
-        this.clientList = new ArrayList<>();
+        this.clients = new ArrayList<>();
+        this.messageHandler = new MessageHandler(clients);
     }
 
     public void startServer(String host, int port)
@@ -28,19 +30,20 @@ public class Server {
         {
             this.serverSocket = new ServerSocket();
             this.serverSocket.bind(new InetSocketAddress(host, port));
-            
-            while(true){
-                
-                ClientHandler client = new ClientHandler(serverSocket.accept(), clientList);
-                ex.execute(client);
-                
+            //starting messageHandler...
+            ex.execute(messageHandler);
+            while (true)
+            {
+                //waiting for new connection.
+                System.out.println("waiting for connection");
+                ex.execute(new ClientHandler(serverSocket.accept(), clients, ex, messageHandler));
+                //created new socket for client
             }
 
-        } catch (IOException ex)
+        } catch (IOException e)
         {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, e);
         }
-
     }
 
 }
