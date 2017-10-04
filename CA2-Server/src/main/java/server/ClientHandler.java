@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,13 +14,11 @@ public class ClientHandler implements Runnable {
     private Socket clientSocket;
     private Scanner in;
     private PrintWriter out;
-    private Collection<ClientHandler> clients;
-    private ExecutorService ex;
+    private Collection<ClientHandler> clients;    
     private MessageHandler messageHandler;
 
-    public ClientHandler(Socket clientSocket, Collection<ClientHandler> clients, ExecutorService ex, MessageHandler ms)
-    {
-        this.ex = ex;
+    public ClientHandler(Socket clientSocket, Collection<ClientHandler> clients, MessageHandler ms)
+    {        
         this.clientSocket = clientSocket;
         this.clients = clients;
         this.messageHandler = ms;
@@ -39,53 +36,23 @@ public class ClientHandler implements Runnable {
         } catch (IOException e)
         {
             Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, e);
-        }        
-        String input;
-        String[] strings = null;
-        // runnable quits if input contains a "'" and if input is correct,
-        // but name is already in the list.
-        // you break out of the loop if input is correct.
-        while ((input = in.nextLine()) != null)
+        }
+        //this write is only there for telnet...
+        writeMessage("Connected to server...");
+        
+        if (isLoggedIn() == false)
         {
-            if (input.contains(","))
-            {
-                System.out.println("',' should not be used");
-                stopConnection();
-                return;
-            }
-
-            strings = input.split(":");
-            if (strings.length == 2 && strings[0].equals("LOGIN"))
-            {
-                for (ClientHandler client : clients)
-                {
-                    if (strings[1].equalsIgnoreCase(client.getName()))
-                    {
-                        System.out.println("Name was already taken");
-                        stopConnection();
-                        return;
-                    }
-                }
-                break;
-            }
-            System.out.println("input was wrong");
+            stopConnection();
+            return;
         }
         System.out.println("adding client to list");
-        this.name = strings[1];
         addClient(this);
-
-        // clientListString() method loops, so init it here, so it does not
-        // loop for every client.
-        String clientListString = clientListString();
-        for (ClientHandler client : clients)
-        {
-            client.writeMessage(clientListString);
-        }
+        sendClientList();
         // user loop is a loop, you can break out if you type "LOGOUT:" 
         // or somethings goes wrong
         userLoop();
 
-        System.out.println("closing clientSocket for " + this.name);        
+        System.out.println("closing clientSocket for " + this.name);
         stopConnection();
     }
 
@@ -102,29 +69,74 @@ public class ClientHandler implements Runnable {
                 {
                     System.out.println("client typed LOGOUT:...");
                     clients.remove(this);
-                    String clientListStr = clientListString();
-                    for (ClientHandler client : clients)
-                    {
-                        client.writeMessage(clientListStr);
-                    }
+                    sendClientList();
                     return;
                 }
                 //creating new message with an sender, the input string and a list of Clients.
-                Message msg = new Message(this, input, this.clients);
-                messageHandler.messages.put(msg);
+                sendMessage(input);
             }
 
         } catch (Exception e) //catches all exceptions... mainly there to keep the list correct.
         {
             System.out.println("her?");
-            Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, e);
             clients.remove(this);
-            String clientListStr = clientListString();
-            for (ClientHandler client : clients)
+            sendClientList();
+        }
+    }
+
+    private boolean isLoggedIn()
+    {
+        String input;
+        String[] strings;
+        // runnable returns if input contains a "," and if input is correct,
+        // but name is already in the list.
+        // you break out of the loop if input is correct.
+        // SHOULD WE REMOVE THIS WHILE LOOP?
+        if ((input = in.nextLine()) != null)
+        {
+            if (input.contains(",") || !input.contains(":"))
             {
-                client.writeMessage(clientListStr);
+                return false;
+            }
+
+            strings = input.split(":");
+            if (strings.length != 2)
+            {
+                return false;
+            }
+            if (strings.length == 2 && strings[0].equals("LOGIN"))
+            {
+                if (isNameTaken(strings[1]))
+                {
+                    return false;
+                } else
+                {
+                    this.name = strings[1];
+                    return true;
+                }
             }
         }
+        return false;
+    }
+
+    public void sendClientList()
+    {
+        Message msg = new Message(this, "CLIENTLIST:", clients);
+        try
+        {
+            messageHandler.messages.put(msg);
+        } catch (InterruptedException ex)
+        {
+            Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void sendMessage(String input) throws InterruptedException
+    {
+        Message msg = new Message(this, input, this.clients);
+        messageHandler.messages.put(msg);
+
     }
 
     public synchronized void writeMessage(String str)
@@ -147,17 +159,16 @@ public class ClientHandler implements Runnable {
         return this.name;
     }
 
-    public String clientListString()
+    private boolean isNameTaken(String name)
     {
-        String clientList = "CLIENTLIST:";
         for (ClientHandler client : clients)
         {
-            clientList += client.getName() + ",";
+            if (name.equalsIgnoreCase(client.getName()))
+            {
+                return true;
+            }
         }
-        StringBuilder sb = new StringBuilder(clientList);
-        sb.deleteCharAt(clientList.length() - 1);
-        return sb.toString();
-
+        return false;
     }
 
     public void stopConnection()

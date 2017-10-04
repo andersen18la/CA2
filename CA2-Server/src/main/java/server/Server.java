@@ -23,7 +23,7 @@ public class Server {
         this.clients = new ArrayList<>();
         this.messageHandler = new MessageHandler(clients);
     }
-
+    
     public void startServer(String host, int port)
     {
         try
@@ -36,7 +36,7 @@ public class Server {
             {
                 //waiting for new connection.
                 System.out.println("waiting for connection");
-                ex.execute(new ClientHandler(serverSocket.accept(), clients, ex, messageHandler));
+                ex.execute(new ClientHandler(serverSocket.accept(), clients, messageHandler));
                 //created new socket for client
             }
 

@@ -17,7 +17,7 @@ public class Message {
     private Collection<ClientHandler> clients;
     private ClientHandler sender;
     private String message;
-    private Collection<ClientHandler> receivers;
+    private Collection<String> receivers;
 
     public Message(ClientHandler sender, String str, Collection<ClientHandler> clients)
     {
@@ -25,21 +25,33 @@ public class Message {
         this.sender = sender;
         this.clients = clients;
         String[] stringsColon = str.split(":");
-        setReceivers(stringsColon);        
+        setReceivers(stringsColon);
         setMessage(stringsColon);
     }
 
     private void setReceivers(String[] stringsColon)
-    {        
+    {
         if (stringsColon.length <= 1)
         {
+            if ("CLIENTLIST".equals(stringsColon[0]))
+            {
+                for (ClientHandler client : clients)
+                {
+                    receivers.add(client.getName());
+                }
+                return;
+            }
             System.out.println("something was wrong with user input");
             return;
         }
+
         if (stringsColon[1].equalsIgnoreCase("*"))
         {
             System.out.println("setting receivers to all users");
-            this.receivers = this.clients;            
+            for (ClientHandler client : clients)
+            {
+                receivers.add(client.getName());
+            }
             return;
         }
 
@@ -47,29 +59,33 @@ public class Message {
         for (String string : stringsComma)
         {
             System.out.println("adding receivers");
-            ClientHandler client = findUser(string);
+            ClientHandler client = findClient(string);
             if (client != null)
             {
-                this.receivers.add(client);
+                this.receivers.add(client.getName());
             }
         }
     }
 
     private void setMessage(String[] colonStr)
     {
-        if (colonStr.length == 3)
+        if ("CLIENTLIST".equals(colonStr[0]))
+        {
+            this.message = clientsToString();
+        } else if (colonStr.length >= 3)
         {
             this.message = "";
             for (int i = 2; i < colonStr.length; i++)
             {
-                this.message = colonStr[i];
+                this.message += colonStr[i];
             }
-        } else {
+        } else
+        {
             System.out.println("string did not have a message");
         }
     }
 
-    private ClientHandler findUser(String userName)
+    private ClientHandler findClient(String userName)
     {
         for (ClientHandler client : clients)
         {
@@ -81,10 +97,27 @@ public class Message {
         return null;
     }
 
+    private String clientsToString()
+    {
+        String clientList = "CLIENTLIST:";
+        for (ClientHandler client : clients)
+        {
+            clientList += client.getName() + ",";
+        }
+        StringBuilder sb = new StringBuilder(clientList);
+        sb.deleteCharAt(clientList.length() - 1);
+        return sb.toString();
+    }
+
     @Override
     public String toString()
     {
+        if (this.message != null && this.message.contains("CLIENTLIST:"))
+        {
+            return this.message;
+        }
         return "MSGRES:" + this.sender.getName() + ":" + this.message;
+
     }
 
     public ClientHandler getSender()
@@ -97,10 +130,9 @@ public class Message {
         return message;
     }
 
-    public Collection<ClientHandler> getReceivers()
+    public Collection<String> getReceivers()
     {
         return receivers;
     }
-
 
 }
