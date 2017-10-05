@@ -35,7 +35,7 @@ public class Server {
             while (true)
             {
                 //waiting for new connection.
-                System.out.println("waiting for connection");
+  //              System.out.println("waiting for connection");
                 ex.execute(new ClientHandler(serverSocket.accept(), clients, messageHandler));
                 //created new socket for client
             }

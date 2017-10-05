@@ -41,13 +41,13 @@ public class Message {
                 }
                 return;
             }
-            System.out.println("something was wrong with user input");
+            //System.out.println("something was wrong with user input");
             return;
         }
 
         if (stringsColon[1].equalsIgnoreCase("*"))
         {
-            System.out.println("setting receivers to all users");
+           // System.out.println("setting receivers to all users");
             for (ClientHandler client : clients)
             {
                 receivers.add(client.getName());
@@ -56,9 +56,9 @@ public class Message {
         }
 
         String[] stringsComma = stringsColon[1].split(",");
+       // System.out.println("adding receivers");
         for (String string : stringsComma)
         {
-            System.out.println("adding receivers");
             ClientHandler client = findClient(string);
             if (client != null)
             {
@@ -81,7 +81,7 @@ public class Message {
             }
         } else
         {
-            System.out.println("string did not have a message");
+           // System.out.println("string did not have a message");
         }
     }
 
