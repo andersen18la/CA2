@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <title>Documentation</title>
+    <title>CA2 Documentation</title>
 </head>
 
 <body>
@@ -27,12 +27,12 @@
             that writes to the other clients. We then loop and listens for connections and if someone connects, then
             we create a new ClientHandler, which implements Runnable, and execute it with its own thread, so we are able
             to have more clients at once. If the client follows the protocol and successfully logged in, he is then added
-            to an ArrayList with ClientHandlers. If anything is wrong with the clients login protocol or the name is
+            to an ArrayList with ClientHandlers. If anything is wrong with the client's login protocol or the name is
             taken, we close the connection.
             <br> The ClientHandler is constantly listening for input. If the input is LOGOUT:, then we remove the Client
-            from the ArrayList and close the connection. If client connection dies, we remove him from the list. If the
+            from the ArrayList and close the connection. If the client connection dies, we remove him from the list. If the
             client tries to chat and follow the protocol, then we create a new Message, which gets the input value, the
-            List of clients and this ClientHandler, as the sender. We then put this Message into an ArrayBlockingQueue
+            List of clients and this ClientHandler, as the sender. We then put this Message into an ArrayBlockingQueue located
             in our MessageHandler, which then sends the message, if it followed protocol, to all relevant receivers.
             <br> Each time the ArrayList of Clients are changed, we send a message to all the logged in users.
             <br><br>Client:
@@ -49,8 +49,8 @@
             <br>Online users are shown in box ontop of the send button.
             <br><br>To write to all on the server, you type your message in the rectangle to the left of send and press
             the send button. Example: "mymessage".
-            <br>To send to a private message you type: “nameOfuser:yourmessage”<br>To send a private message to more
-            users, then type: “name1,name2:yourmessage”.
+            <br>To send to a private message you type: "nameOfuser:yourmessage"<br>To send a private message to more
+            users, then type: "name1,name2:yourmessage".
             <br>Click logout or press the red X in the top to logout.
             <br><br>If the server is down you need to run the ServerInit.class in CA2-Server project.
             <br><br> You can also use telnet and connect to jdbh.dk 8081.
@@ -58,18 +58,14 @@
         <hr>
         <h2>Test Against Others
         </h2>
+        <p>
+            All test involves logging in and logging out, sending to all, sending a private message to one clients, and sending a private message to two clients.
+        </p>
         <img src="group1.jpg" alt="group1 test">
         <img src="group1-2.png" alt="group1 test">
         <p>
-            Test of our gui against GROUP1 server worked.
+            Test of our gui against Group 1 server worked.
             They tried to use their gui against ours and it worked.
-        </p>
-
-        <img src="brein2.jpg" alt="breindal test"/>
-        <img src="brein1.jpg" alt="breindal test"/>
-        <p>
-            Test of our GUI against Group 5 worked.
-            They tested our server with their gui and it worked.
         </p>
         <img src="testrunogpeter.jpg" alt="runeogpeter test"/>
         <img src="peterogrune2.png" alt="runeogpeter test"/>
@@ -77,15 +73,14 @@
             Test of our GUI against Group 11's server worked somewhat. Their list on the server did not update correctly because of an exception, when the client just closes the connection without logging out.
             Also something was wrong with their gui, so they have not tested their gui with our server.
         </p>
-
-        <p>
+        <p>            
             Group 10 and Group 15 tested our server and said it worked, but we did not have an working GUI at that time, so we did not test their server.
         </p>
 
         <hr>
         <h2>Who worked on what</h2>
         <p>
-            We mostly all worked on the project, and alot of it was done on a single pc, so the commits might not be proportionate with
+            We all worked on the project, and alot of it was done on a single pc, so the commits might not be proportionate with
             the amount of work each group member did.
         </p>
         <hr>
