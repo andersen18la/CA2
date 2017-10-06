@@ -25,7 +25,7 @@
             <br> Server:
             <br> When the server starts, we bind the Server Socket and execute the MessageHandler in a new thread, which is the class
             that writes to the other clients. We then loop and listens for connections and if someone connects, then
-            we create a new ClientHandler, which implements Runnable, and execute it with its own thread, so we able
+            we create a new ClientHandler, which implements Runnable, and execute it with its own thread, so we are able
             to have more clients at once. If the client follows the protocol and successfully logged in, he is then added
             to an ArrayList with ClientHandlers. If anything is wrong with the clients login protocol or the name is
             taken, we close the connection.
@@ -85,7 +85,7 @@
         <hr>
         <h2>Who worked on what</h2>
         <p>
-            we mostly all worked on the project, and alot of it was done on a single pc, so the commits might not be proportionate with
+            We mostly all worked on the project, and alot of it was done on a single pc, so the commits might not be proportionate with
             the amount of work each group member did.
         </p>
         <hr>

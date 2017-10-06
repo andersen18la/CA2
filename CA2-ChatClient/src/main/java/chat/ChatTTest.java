@@ -15,10 +15,14 @@ public class ChatTTest {
 
     public static void main(String[] args) throws IOException, InterruptedException
     {
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < 10; i++)
         {
 
             ChatClient client = new ChatClient();
+            client.addObserver((msg) ->
+            {
+                System.out.println(msg);
+            });
 
             client.connect("127.0.0.1", 8081);
             client.send("LOGIN:BOB" + i);
