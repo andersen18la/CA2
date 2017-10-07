@@ -1,2 +1,7 @@
 # CA2
-The original CA2 description with a chatserver
+
+Members for group 13:
+Hallur við Neyst
+Murched Kayed
+John David Bloch Hansen
+Lasse Hougaard Andersen
