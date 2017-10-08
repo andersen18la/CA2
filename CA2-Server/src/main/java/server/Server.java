@@ -19,7 +19,7 @@ public class Server {
 
     public Server()
     {
-        this.ex = Executors.newCachedThreadPool();
+        this.ex = Executors.newFixedThreadPool(15);
         this.clients = new ArrayList<>();
         this.messageHandler = new MessageHandler(clients);
     }
